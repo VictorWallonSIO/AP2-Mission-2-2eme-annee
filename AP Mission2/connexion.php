@@ -31,13 +31,13 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto py-4 py-lg-0">
                     <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.php">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="livres.php">Livres</a></li>
 
                     <?php
                     // Vérifier si l'utilisateur est connecté
                     if (isset($_SESSION['id'])) {
                         // Ajouter l'option de déconnexion
                         echo '<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="deconnexion.php">Déconnexion</a></li>';
+                        echo '<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="gestionbdd.php">Gestion</a></li>';
                     } else {
                         // Ajouter les options de connexion et d'inscription si l'utilisateur n'est pas connecté
                         echo '<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="connexion.php">Se connecter</a></li>';
@@ -87,7 +87,7 @@
 
                     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // Connexion à la base de données avec PDO
-                    $dsn = "mysql:host=localhost;dbname=gsb_praticienCompletee;charset=utf8";
+                    $dsn = "mysql:host=172.22.48.38;dbname=gsb_praticienCompletee;charset=utf8";
 
                     try {
                         $conn = new PDO($dsn, $id, $mdp);
@@ -109,6 +109,7 @@
                     if ($user && ($mdp == $mdpBDD)) {
                         // Stocker les informations de l'utilisateur dans la session
                         $_SESSION['id'] = $user;
+                        $_SESSION['mdp'] = $mdp;
 
                     } else {
                         // Afficher un message d'erreur si les identifiants sont incorrects

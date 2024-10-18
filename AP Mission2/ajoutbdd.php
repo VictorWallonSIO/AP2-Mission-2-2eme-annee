@@ -74,109 +74,67 @@
                         de la région avec les options qui vous sont proposé</h3>
 
                     </div>
-                </div> <br>
-                <div class="lst_donnee">
+                </div> <br> <br>
 
-                <form action="gestionbdd.php" method="POST">
-                <input type="text" name="search" placeholder="Rechercher...">
-                <input type="submit" name="search_launch" value="Rechercher">
-                <button type="button" name="ajout" class="btn btn-pra"><a href="ajoutbdd.php">Ajouter</a></button>
+                <form action="#" method="POST">
+                <input type="text" name="nom" placeholder="Nom">
+                <input type="text" name="prenom" placeholder="Prenom">
+                <input type="text" name="adresse" placeholder="Adresse">
+                <input type="text" name="code_type" placeholder="Code type praticien"> 
+                <br><br>
+                <button type="submit" name="ajout" class="btn btn-pra">Ajouter</button>
                 </form>
 
                 <?php
 
-                if(isset($_POST["search_launch"])) {
-                    rechercher();
+                if(isset($_POST["ajout"])) {
+                    ajouter();
                 }
 
-                    function rechercher() {
-                        $search = $_POST["search"] ?? "";
-                        $pdo = new PDO ("mysql:host=172.22.48.38;dbname=gsb_praticienCompletee",$_SESSION['id'],$_SESSION['mdp']) ?? "";
-
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-$affichage_praticien = $pdo->prepare("SELECT bretagne.idPra, bretagne.nom, bretagne.prenom, bretagne.adresse, bretagne.coef_notoriete, bretagne.salaire, bretagne.code_type_praticien FROM bretagne WHERE nom like :search OR prenom like :search OR adresse like :search OR coef_notoriete like :search OR salaire like :search OR code_type_praticien like :search LIMIT 50");
-$affichage_praticien->bindValue(':search', $search. '%', PDO::PARAM_STR);
-$affichage_praticien->execute();
-
-$result_affichage_praticien = $affichage_praticien->fetchAll(PDO::FETCH_OBJ);
-
-$nbresult = count($result_affichage_praticien);
-
-echo '<pre>';
-echo("Nom");
-echo ' - ';
-echo("Prénom");
-echo ' - ';
-echo("Adresse");
-echo ' - ';
-echo("Coef_notoriete");
-echo ' - ';
-echo("Salaire");
-echo ' - ';
-echo("code_type_praticien");
-echo '</pre>';
-
-echo '<br><br>';
-
-for($n = 0; $n < $nbresult; $n++) 
-{
-      echo '<div class="lst">';
-      echo '<pre>';
-      echo ($result_affichage_praticien[$n]->nom);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->prenom);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->adresse);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->coef_notoriete);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->salaire);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->code_type_praticien);
-
-      echo '<form action="#" method="POST">';
-      echo '<button type="submit" name="del_btn" class="btn btn-pra">Supprimer</button>';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->idPra.'" name="idPra">';
-      echo '</form>';
-      echo '<br>';
-      echo '<form action="modifbdd.php" method="POST">';
-      echo '<button type="submit" name="modif_btn" class="btn btn-pra">Modifier</button>';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->idPra.'" name="idPra">';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->nom.'" name="Nom">';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->prenom.'" name="Prenom">';
-      echo '</form>';
-      echo '</pre>';
-      echo '<br>';
-      echo '</div>';
-      echo '<br>';
-    }
-}                
-    if(isset($_POST["del_btn"])) {
-        delete();
-    }
-
-    function delete() {
+                    function ajouter() {
                         try 
                         {
-                            $id = $_POST['idPra'] ?? "";
+                            $nom = $_POST["nom"] ?? "";
+                            $prenom = $_POST["prenom"] ?? "";
+                            $adresse = $_POST["adresse"] ?? "";
+                            $code_type = $_POST["code_type"] ?? "";
+                            
                             $pdo = new PDO ("mysql:host=172.22.48.38;dbname=gsb_praticienCompletee",$_SESSION['id'],$_SESSION['mdp']) ?? "";
     
                             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                            $modif_praticien = $pdo->prepare("DELETE FROM praticien WHERE praticien.id = :id");
-                            $modif_praticien->bindParam('id', $id, PDO::PARAM_INT);
-                            $modif_praticien->execute();
+                            
+                            $verif_code = false;
+                            $tab_code_type = ["MV","MH","PH","PO","PS",
+                        "mv","mh","ph","po","ps"];
 
-                            echo "<p class='vert'> Purgé avec succès </p>";
+                            foreach($tab_code_type as $i) 
+                            {
+                                if($code_type == $i) 
+                                {
+                                    $verif_code = true;
+                                    break;
+                                }
+                            }
+
+                            if($verif_code) 
+                            {
+                                $affichage_praticien = $pdo->prepare("INSERT INTO praticien VALUES (?,?,?,?,?,?,?,?)");
+                                $affichage_praticien->execute(array(null,$nom,$prenom,$adresse,0,0,$code_type,11032));
+                                echo "<p class='vert'> Ajout fait avec succès </p>";
+                            }
+                            else 
+                            {
+                                echo "<p id='message'>Erreur lors de l'insertion : le code type n'existe pas : </p>";
+                            }
                         }
-                        catch (PDOException $e)
+                        catch (PDOException $e) 
                         {
-                            echo "<p id='message'>Erreur lors de la suppression : </p>" . $e->getMessage();
+                            echo "<p id='message'>Erreur lors de l'insertion' : </p>" . $e->getMessage();
                         }
-    }
+
+                        }                
 
     ?>
-        </div>
             </div>
         </div>
         <!-- Bootstrap core JS-->

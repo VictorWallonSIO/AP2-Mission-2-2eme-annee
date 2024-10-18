@@ -77,103 +77,51 @@
                 </div> <br>
                 <div class="lst_donnee">
 
-                <form action="gestionbdd.php" method="POST">
-                <input type="text" name="search" placeholder="Rechercher...">
-                <input type="submit" name="search_launch" value="Rechercher">
-                <button type="button" name="ajout" class="btn btn-pra"><a href="ajoutbdd.php">Ajouter</a></button>
+                <form action="#" method="POST">
+                <input type="text" name="new_value" placeholder="Nouvelle valeur">
+                <br>
+                <select name="select_modif" id ="select_modif">
+                    <option value="nom">Nom</option>
+                    <option value="prenom">Prenom</option>
+                    <option value="adresse">Adresse</option>
+                    <option value="coef_notoriete">Coef_notoriete</option>
+                    <option value="salaire">Salaire</option>
+                    <option value="code_type_praticien">Code type praticien</option>
+                </select>
+                <?php echo '<input type="hidden" value="'.$_POST['idPra'].'" name="idPra">'; ?>
+                <button type="submit" name="modif" class="btn btn-pra">Modifier</button>
                 </form>
 
                 <?php
+                $nom = $_POST['Nom'] ?? "";
+                $prenom = $_POST['Prenom'] ?? "";
+                echo "Modification pour la praticien " . $nom . " " . $prenom;
 
-                if(isset($_POST["search_launch"])) {
-                    rechercher();
+                if(isset($_POST["modif"])) {
+                    modifier();
                 }
 
-                    function rechercher() {
-                        $search = $_POST["search"] ?? "";
-                        $pdo = new PDO ("mysql:host=172.22.48.38;dbname=gsb_praticienCompletee",$_SESSION['id'],$_SESSION['mdp']) ?? "";
-
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-$affichage_praticien = $pdo->prepare("SELECT bretagne.idPra, bretagne.nom, bretagne.prenom, bretagne.adresse, bretagne.coef_notoriete, bretagne.salaire, bretagne.code_type_praticien FROM bretagne WHERE nom like :search OR prenom like :search OR adresse like :search OR coef_notoriete like :search OR salaire like :search OR code_type_praticien like :search LIMIT 50");
-$affichage_praticien->bindValue(':search', $search. '%', PDO::PARAM_STR);
-$affichage_praticien->execute();
-
-$result_affichage_praticien = $affichage_praticien->fetchAll(PDO::FETCH_OBJ);
-
-$nbresult = count($result_affichage_praticien);
-
-echo '<pre>';
-echo("Nom");
-echo ' - ';
-echo("Prénom");
-echo ' - ';
-echo("Adresse");
-echo ' - ';
-echo("Coef_notoriete");
-echo ' - ';
-echo("Salaire");
-echo ' - ';
-echo("code_type_praticien");
-echo '</pre>';
-
-echo '<br><br>';
-
-for($n = 0; $n < $nbresult; $n++) 
-{
-      echo '<div class="lst">';
-      echo '<pre>';
-      echo ($result_affichage_praticien[$n]->nom);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->prenom);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->adresse);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->coef_notoriete);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->salaire);
-      echo ' - ';
-      echo ($result_affichage_praticien[$n]->code_type_praticien);
-
-      echo '<form action="#" method="POST">';
-      echo '<button type="submit" name="del_btn" class="btn btn-pra">Supprimer</button>';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->idPra.'" name="idPra">';
-      echo '</form>';
-      echo '<br>';
-      echo '<form action="modifbdd.php" method="POST">';
-      echo '<button type="submit" name="modif_btn" class="btn btn-pra">Modifier</button>';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->idPra.'" name="idPra">';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->nom.'" name="Nom">';
-      echo '<input type="hidden" value="'.$result_affichage_praticien[$n]->prenom.'" name="Prenom">';
-      echo '</form>';
-      echo '</pre>';
-      echo '<br>';
-      echo '</div>';
-      echo '<br>';
-    }
-}                
-    if(isset($_POST["del_btn"])) {
-        delete();
-    }
-
-    function delete() {
+                    function modifier() {
                         try 
                         {
                             $id = $_POST['idPra'] ?? "";
+                            $new_value = $_POST['new_value'] ?? "";
+                            $select_modif = $_POST['select_modif'] ?? "";
                             $pdo = new PDO ("mysql:host=172.22.48.38;dbname=gsb_praticienCompletee",$_SESSION['id'],$_SESSION['mdp']) ?? "";
     
                             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                            $modif_praticien = $pdo->prepare("DELETE FROM praticien WHERE praticien.id = :id");
+                            $modif_praticien = $pdo->prepare("UPDATE praticien SET praticien." . $select_modif . " " . " = :new_value WHERE praticien.id = :id");
                             $modif_praticien->bindParam('id', $id, PDO::PARAM_INT);
+                            $modif_praticien->bindParam('new_value', $new_value, PDO::PARAM_STR);
                             $modif_praticien->execute();
 
-                            echo "<p class='vert'> Purgé avec succès </p>";
+                            echo "<p class='vert'> Modifier avec succès </p>";
                         }
                         catch (PDOException $e)
                         {
-                            echo "<p id='message'>Erreur lors de la suppression : </p>" . $e->getMessage();
+                            echo "<p id='message'>Erreur lors de la modification : </p>" . $e->getMessage();
                         }
-    }
+                }                
 
     ?>
         </div>
