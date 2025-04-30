@@ -118,8 +118,8 @@
 
                             if($verif_code) 
                             {
-                                $affichage_praticien = $pdo->prepare("INSERT INTO praticien VALUES (?,?,?,?,?,?,?,?)");
-                                $affichage_praticien->execute(array(null,$nom,$prenom,$adresse,0,0,$code_type,11032));
+                                $affichage_praticien = $pdo->prepare("INSERT INTO praticien VALUES (?,?,?,?,?,?,?,?,?)");
+                                $affichage_praticien->execute(array(null,$nom,$prenom,"1234",$adresse,0,0,$code_type,11032));
                                 echo "<p class='vert'> Ajout fait avec succès </p>";
                             }
                             else 
